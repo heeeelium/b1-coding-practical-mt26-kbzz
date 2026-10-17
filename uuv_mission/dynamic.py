@@ -76,8 +76,10 @@ class Mission:
 
     @classmethod
     def from_csv(cls, file_name: str):
-        # You are required to implement this method
-        pass
+        df = pd.read_csv(file_name)
+        return cls(df['reference'].to_numpy(),
+                   df['cave_height'].to_numpy(),
+                   df['cave_depth'].to_numpy())
 
 
 class ClosedLoop:
@@ -99,7 +101,7 @@ class ClosedLoop:
         for t in range(T):
             positions[t] = self.plant.get_position()
             observation_t = self.plant.get_depth()
-            actions[t] = self.controller.compute_action(mission.reference[t], observation_t)
+            actions[t] = self.controller(observation_t, mission.reference[t])
             self.plant.transition(actions[t], disturbances[t])
 
         return Trajectory(positions)
